@@ -1,0 +1,114 @@
+decision_system/
+│
+├── core/
+│   ├── rule.py          # Eine einzelne Regel
+│   ├── rule_engine.py   # Führt Regeln aus
+│   ├── decision.py      # Finale Entscheidung
+│
+├── data/
+│   └── input_data.py    # Test-/Fake-Daten
+│
+├── evaluation/
+│   └── scorer.py        # Bewertungslogik
+│
+├── logging/
+│   └── logger.py        # Debug-Logs
+│
+└── main.py              # Orchestrierung (keine Logik)
+
+
+
+
+
+
+
+
+# new 
+core/
+explain/
+-explainable_rule_engine.py
+-explanation.py
+rules/
+-init
+-base rule
+-registry
+-risk rule
+-rule test cases
+-value rule
+-volatility rule
+tests/
+hier sind alle meine test datein im core ordner also der ordner ist nicht leer
+data/
+-init 
+input_data
+evaluation/
+-init
+-adaptive weights logger
+-adaptive weights
+-adaptive.py
+-explenation conflict.py
+-explanation
+-history storage
+-history.py
+-performance.py
+-scorer
+-visualization
+tests/
+- hier der test ordner 
+venv/
+
+init im hauptordner 
+main.py
+
+
+
+rule_based_decision_system/
+│
+├─ core/
+│   └─ rules/
+│       ├─ base_rule.py
+│       ├─ value_rule.py
+│       ├─ risk_rule.py
+│       └─ volatility_rule.py
+│   └─ rule_engine.py
+│   └─ decision.py
+│
+├─ evaluation/
+│   ├─ adaptive.py
+│   └─ visualization.py
+│
+├─ data/
+│   └─ input_data.py
+│
+├─ app_logging/
+│   └─ logger.py
+│
+├─ main_helpers.py
+├─ main.py
+└─ requirements.txt
+
+evaluation/
+adaptive_engine.py
+adaptive_weights_logger.py
+adaptive_thresholds.py
+adaptive_weights.py
+explenation_conflict.py
+history_storage.py
+history.py
+parameter_adjuster.py
+performance.py
+scorer.py
+
+core/rules/
+registry.py
+adaptive_trend_weights.py
+adaptive_weights.py
+conflict_resolver.py
+system_runner.py
+system_setup.py
+
+
+
+
+
+
