@@ -4,10 +4,12 @@ import importlib
 import pkgutil
 import inspect
 from core.rules import __path__ as rules_path
+from core.rules.base_rule import Rule
 from core.rule_engine import RuleEngine
 from core.decision import Decision
 from evaluation.scorer import Scorer
 from app_logging.logger import setup_logger
+
 
 def test_all_rules_auto():
     logger = setup_logger()
@@ -17,13 +19,12 @@ def test_all_rules_auto():
     for _, modname, _ in pkgutil.iter_modules(rules_path):
         module = importlib.import_module(f"core.rules.{modname}")
         for name, obj in inspect.getmembers(module, inspect.isclass):
-            # Nur Klassen, die evaluate implementieren
-            if hasattr(obj, "evaluate") and not bool(getattr(obj, "__abstractmethods__", False)):
+            # Nur konkrete Rule-Klassen: evaluate muss ueberschrieben sein,
+            # da die Basisklasse NotImplementedError wirft statt @abstractmethod
+            if hasattr(obj, "evaluate") and obj.evaluate is not Rule.evaluate:
                 rules_classes.append(obj)
 
-    if not rules_classes:
-        print("Keine konkreten Rule-Klassen gefunden!")
-        return
+    assert rules_classes, "Keine konkreten Rule-Klassen gefunden!"
 
     # --- 2. Testdaten ---
     test_data = [
@@ -63,19 +64,22 @@ def test_all_rules_auto():
     for i, data in enumerate(test_data):
         scores = engine.run(data)
         total = scorer.total_score(scores)
-        decision = decision_system.make(total)
+        decision, explanation = decision_system.make(total)
 
         # Dynamische erwartete Decision basierend auf Thresholds
         expected_decision = (
-            "ACCEPT" if total >= decision_system.threshold_accept else
-            "REJECT" if total <= decision_system.threshold_reject else
-            "HOLD"
+            "ACCEPT"
+            if total >= decision_system.threshold_accept
+            else "REJECT"
+            if total <= decision_system.threshold_reject
+            else "HOLD"
         )
 
         assert decision == expected_decision, (
-            f"Test Case {i+1} failed: Total={total:.2f}, expected {expected_decision}, got {decision}"
+            f"Test Case {i + 1} failed: Total={total:.2f}, expected {expected_decision}, got {decision}"
         )
-        print(f"Test Case {i+1} passed: Total={total:.2f}, Decision={decision}")
+        print(f"Test Case {i + 1} passed: Total={total:.2f}, Decision={decision}")
+
 
 if __name__ == "__main__":
     test_all_rules_auto()

@@ -6,6 +6,7 @@ from core.decision import Decision
 from evaluation.scorer import Scorer
 from app_logging.logger import setup_logger
 
+
 def test_rule_decisions():
     logger = setup_logger()
 
@@ -15,7 +16,8 @@ def test_rule_decisions():
         ({"value": 50, "risk": 0.4, "volatility": 0.25}, "REJECT"),
         ({"value": 60, "risk": 0.3, "volatility": 0.2}, "ACCEPT"),
         ({"value": 40, "risk": 0.5}, "REJECT"),
-        ({"risk": 0.2, "volatility": 0.1}, "HOLD"),
+        ({"risk": 0.2, "volatility": 0.1}, "ACCEPT"),  # Total=0.5 -> inklusive Grenze
+        ({"risk": 0.2}, "HOLD"),  # Total=0.3 -> zwischen Thresholds
         ({"value": 65}, "ACCEPT"),
     ]
 
@@ -23,7 +25,7 @@ def test_rule_decisions():
     rules = [
         (ValueRule(logger, min_value=60), 0.5),
         (RiskRule(logger, max_risk=0.3), 0.3),
-        (VolatilityRule(logger, max_volatility=0.2), 0.2)
+        (VolatilityRule(logger, max_volatility=0.2), 0.2),
     ]
 
     engine = RuleEngine(rules, logger)
@@ -33,9 +35,12 @@ def test_rule_decisions():
     for i, (data, expected_decision) in enumerate(test_cases):
         scores = engine.run(data)
         total = scorer.total_score(scores)
-        decision = decision_system.make(total)
-        assert decision == expected_decision, f"Test Case {i+1} failed: expected {expected_decision}, got {decision}"
-        print(f"Test Case {i+1} passed: Decision={decision}")
+        decision, explanation = decision_system.make(total)
+        assert decision == expected_decision, (
+            f"Test Case {i + 1} failed: expected {expected_decision}, got {decision}"
+        )
+        print(f"Test Case {i + 1} passed: Decision={decision}")
+
 
 if __name__ == "__main__":
     test_rule_decisions()

@@ -87,3 +87,7 @@ python -m pytest
 ```
 
 Benötigt Python 3.12 (getestet mit 3.12.6).
+
+Hinweis für Windows-Konsolen mit Legacy-Codepage (cp1252): die Demo-Ausgabe
+enthält Unicode-Zeichen (z. B. „≥"). Mit `PYTHONUTF8=1` (oder Windows-Terminal)
+läuft `python main.py` vollständig durch.
