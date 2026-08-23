@@ -1,0 +1,8 @@
+# Direct dependencies, pinned to the versions proven by the previously
+# committed virtualenv (Python 3.12.6, verified working 2026-08).
+# numpy is intentionally NOT listed: it is a transitive dependency of
+# matplotlib; no module in this repository imports it directly.
+matplotlib==3.10.8
+
+# Test dependency
+pytest==9.0.2

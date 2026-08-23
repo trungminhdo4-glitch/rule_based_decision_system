@@ -61,3 +61,29 @@ rule_based_decision_system/
 ├── main.py                     # Orchestrator (Entry Point)
 ├── requirements.txt
 └── README.md
+```
+
+---
+
+## 🛠 Setup & Ausführung
+
+```bash
+git clone https://github.com/trungminhdo4-glitch/rule_based_decision_system.git
+cd rule_based_decision_system
+
+python -m venv venv
+# Windows:
+venv\Scripts\activate
+# Linux/macOS:
+# source venv/bin/activate
+
+pip install -r requirements.txt
+
+# Demo ausführen (erzeugt Matplotlib-Fenster am Ende)
+python main.py
+
+# Tests ausführen
+python -m pytest
+```
+
+Benötigt Python 3.12 (getestet mit 3.12.6).
