@@ -130,6 +130,54 @@ def test_recorded_weights_match_applied_weights():
         adaptive.adjust_weights(history)
 
 
+def test_production_records_snapshots_before_adapting(monkeypatch):
+    import main as production
+
+    histories = []
+    thresholds_used = []
+
+    class CapturingHistory(HistoricalPerformance):
+        def __init__(self):
+            super().__init__()
+            histories.append(self)
+
+    class CapturingDecision(production.Decision):
+        def make(self, total_score, rule_details=None):
+            thresholds_used.append(
+                {"accept": self.threshold_accept, "reject": self.threshold_reject}
+            )
+            return super().make(total_score, rule_details)
+
+    monkeypatch.setattr(production, "setup_logger", DummyLogger)
+    monkeypatch.setattr(
+        production,
+        "get_sample_data",
+        lambda: [{}, {"value": 70}, {"value": 70}],
+    )
+    monkeypatch.setattr(production, "HistoricalPerformance", CapturingHistory)
+    monkeypatch.setattr(production, "Decision", CapturingDecision)
+    monkeypatch.setattr(production, "plot_history", lambda history: None)
+
+    production.main()
+
+    history = histories[0]
+    assert len(history.history) == len(thresholds_used) == 3
+    for entry, recorded_weights, recorded_thresholds, used_thresholds in zip(
+        history.history,
+        history.weights_history,
+        history.thresholds_history,
+        thresholds_used,
+    ):
+        applied_weights = {detail["rule"]: detail["weight"] for detail in entry["details"]}
+        assert recorded_weights == applied_weights
+        assert recorded_thresholds == used_thresholds
+
+    # Neutral history preserves weights, but its HOLD still adapts the next thresholds.
+    assert history.weights_history[1] == history.weights_history[0]
+    assert history.weights_history[2] != history.weights_history[1]
+    assert thresholds_used[1] != thresholds_used[0]
+
+
 def test_explainable_rule_engine_uses_live_weights():
     # A4-Verifikation: ExplainableRuleEngine hat dasselbe Muster und folgt demselben Fix
     logger, rules = _build_rules()
