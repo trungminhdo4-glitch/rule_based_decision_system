@@ -88,5 +88,17 @@ def test_adjust_weights_favours_consistently_passing_rule():
     )
 
 
+def test_adjust_weights_ignores_history_without_rule_signal():
+    rules, history, adaptive = build_system()
+    initial_weights = {r.__class__.__name__: r.weight for r in rules}
+    feed_history(rules, history, [{}])
+
+    adaptive.adjust_weights(history, alpha=0.2)
+
+    new_weights = {r.__class__.__name__: r.weight for r in rules}
+    assert new_weights == initial_weights
+    assert abs(sum(new_weights.values()) - 1.0) < 1e-9
+
+
 if __name__ == "__main__":
     test_adjust_weights_favours_consistently_passing_rule()

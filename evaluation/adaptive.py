@@ -14,7 +14,9 @@ class AdaptiveEngine:
             for d in entry["details"]:
                 rule_scores[d["rule"]].append(abs(d["score"]))
         avg_scores = {r: sum(scores)/len(scores) if scores else 0.0 for r, scores in rule_scores.items()}
-        total = sum(avg_scores.values()) or 1.0
+        total = sum(avg_scores.values())
+        if total == 0:
+            return
         for rule in self.rules:
             name = rule.__class__.__name__
             old_weight = getattr(rule, "weight", 1.0/len(self.rules))
