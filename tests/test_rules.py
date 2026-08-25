@@ -3,6 +3,7 @@ import pytest
 
 from core.rules.value_rule import ValueRule
 from core.rules.risk_rule import RiskRule
+from core.rules.volatility_rule import VolatilityRule
 from app_logging.logger import setup_logger
 
 
@@ -49,6 +50,31 @@ def test_value_rule_none_is_neutral():
 
     assert rule.evaluate({}) == 0.0
     assert rule.evaluate({"value": None}) == 0.0
+
+
+@pytest.mark.parametrize("non_finite", [float("nan"), float("inf"), float("-inf")])
+@pytest.mark.parametrize(
+    ("rule_class", "field", "threshold_name", "threshold", "reason"),
+    [
+        (ValueRule, "value", "min_value", 60, "value missing or invalid"),
+        (RiskRule, "risk", "max_risk", 0.3, "risk missing or invalid"),
+        (
+            VolatilityRule,
+            "volatility",
+            "max_volatility",
+            0.2,
+            "volatility missing or invalid",
+        ),
+    ],
+)
+def test_builtin_rules_treat_non_finite_input_as_neutral(
+    non_finite, rule_class, field, threshold_name, threshold, reason
+):
+    logger = setup_logger()
+    rule = rule_class(logger, **{threshold_name: threshold})
+
+    assert rule.evaluate({field: non_finite}) == 0.0
+    assert rule.last_reason == reason
 
 
 @pytest.mark.parametrize("bool_input", [True, False])
