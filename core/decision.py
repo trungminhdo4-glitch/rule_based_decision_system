@@ -1,4 +1,6 @@
 import math
+from decimal import Decimal
+from numbers import Rational, Real
 
 
 class Decision:
@@ -8,7 +10,13 @@ class Decision:
         self.threshold_reject = threshold_reject
 
     def make(self, total_score, rule_details=None):
-        if isinstance(total_score, float) and not math.isfinite(total_score):
+        if (
+            isinstance(total_score, Decimal) and not total_score.is_finite()
+        ) or (
+            isinstance(total_score, Real)
+            and not isinstance(total_score, Rational)
+            and not math.isfinite(total_score)
+        ):
             decision = "HOLD"
         elif total_score >= self.threshold_accept:
             decision = "ACCEPT"
