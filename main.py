@@ -50,17 +50,17 @@ def main():
         for line in explanation:
             print("-", line)
 
-        # Adaptive Updates
-        adaptive.adjust_weights(history)
-        adaptive.adjust_rule_parameters(history)
-        adaptive.adapt_thresholds(history)
-
         # Historie speichern
         history.add(
             data, total_score, decision, details,
             weights={r.__class__.__name__: r.weight for r in rule_objects},
             thresholds={"accept": decision_system.threshold_accept, "reject": decision_system.threshold_reject}
         )
+
+        # Adaptive Updates
+        adaptive.adjust_weights(history)
+        adaptive.adjust_rule_parameters(history)
+        adaptive.adapt_thresholds(history)
 
     # Zusammenfassung und Visualisierung
     summary = history.summary()
