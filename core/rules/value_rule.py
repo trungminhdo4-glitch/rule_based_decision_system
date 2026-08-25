@@ -1,3 +1,5 @@
+import math
+
 from core.rules.base_rule import Rule
 
 
@@ -8,7 +10,11 @@ class ValueRule(Rule):
 
     def evaluate(self, data) -> float:
         value = data.get("value")
-        if value is None or not isinstance(value, (int, float)):
+        if (
+            value is None
+            or not isinstance(value, (int, float))
+            or (isinstance(value, float) and not math.isfinite(value))
+        ):
             self.last_reason = "value missing or invalid"
             return 0.0
         if value >= self.min_value:

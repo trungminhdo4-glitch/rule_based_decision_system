@@ -1,4 +1,6 @@
 # tests/test_decision.py
+import pytest
+
 from core.decision import Decision
 from app_logging.logger import setup_logger
 
@@ -47,3 +49,14 @@ def test_decision_explanation_contract():
     assert len(explanation) == len(details)
     assert "ValueRule" in explanation[0]
     assert "weight=0.50" in explanation[0]
+
+
+@pytest.mark.parametrize("total_score", [float("nan"), float("inf"), float("-inf")])
+def test_non_finite_total_score_is_hold(total_score):
+    logger = setup_logger()
+    decision_system = _make_decision_system(logger)
+
+    decision, explanation = decision_system.make(total_score)
+
+    assert decision == "HOLD"
+    assert explanation == []

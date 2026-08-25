@@ -1,3 +1,5 @@
+import math
+
 from core.rules.base_rule import Rule
 
 class VolatilityRule(Rule):
@@ -7,7 +9,11 @@ class VolatilityRule(Rule):
 
     def evaluate(self, data) -> float:
         vol = data.get("volatility")
-        if vol is None or not isinstance(vol, (int, float)):
+        if (
+            vol is None
+            or not isinstance(vol, (int, float))
+            or (isinstance(vol, float) and not math.isfinite(vol))
+        ):
             self.last_reason = "volatility missing or invalid"
             return 0.0
         if vol <= self.max_volatility:

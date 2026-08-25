@@ -1,3 +1,5 @@
+import math
+
 from core.rules.base_rule import Rule
 
 class RiskRule(Rule):
@@ -7,7 +9,11 @@ class RiskRule(Rule):
 
     def evaluate(self, data) -> float:
         risk = data.get("risk")
-        if risk is None or not isinstance(risk, (int, float)):
+        if (
+            risk is None
+            or not isinstance(risk, (int, float))
+            or (isinstance(risk, float) and not math.isfinite(risk))
+        ):
             self.last_reason = "risk missing or invalid"
             return 0.0
         if risk <= self.max_risk:
